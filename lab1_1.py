@@ -4,10 +4,10 @@ DICT = {}
 DATA_PATH_LIST = ["./res/199801_seg&pos.txt"]
 DICT_PATH = "./res/dic.txt"
 
-total_word_num = 0
+TOTAL_WORD_NUM = 0
 
 def load_by_line(string):
-    global total_word_num
+    global TOTAL_WORD_NUM
     word_list = string.split()
     for word in word_list:
         parts = word.split("/")
@@ -19,11 +19,11 @@ def load_by_line(string):
         else:
             i = DICT[parts[0]].index(parts[1]) + 1
             DICT[parts[0]][i] += 1
-        total_word_num += 1
+        TOTAL_WORD_NUM += 1
 
 
 def output_dict():
-    dict_file = open(DICT_PATH, "w", encoding='utf-8')
+    dict_file = open(DICT_PATH, "w")
     i = 0
     for key in DICT:
         line = key + ":"
@@ -32,7 +32,7 @@ def output_dict():
                 line += value + " "
                 i = 1
             else:
-                line += str(value / total_word_num) + " "
+                line += str(value / TOTAL_WORD_NUM) + " "
                 i = 0
         dict_file.write(line + '\n')
     dict_file.close()
@@ -40,7 +40,7 @@ def output_dict():
 
 if __name__ == "__main__":
     for Data_path in DATA_PATH_LIST:
-        Data_file = open(Data_path, 'r', encoding='utf-8')
+        Data_file = open(Data_path, 'r')
         Str = Data_file.readline()
         while Str != '':
             Str = Data_file.readline()
