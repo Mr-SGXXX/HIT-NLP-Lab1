@@ -8,30 +8,24 @@ DICT = []
 MAX_LEN = 0
 
 
-# LONGEST_STR = ''
-
-
 def load_dict(dict_path):
-    global DICT, MAX_LEN  # , LONGEST_STR
-    dict_file = open(dict_path, 'r')
-    line = dict_file.readline()
-    last_len = 0
-    while line != '':
-        try:
-            length = int(line)
-            while last_len != length:
-                DICT.append([])
-                last_len += 1
-            line = dict_file.readline()
-        except ValueError:
-            part = line.split(":")
-            DICT[length - 1].append(part[0])
-            # DICT[length - 1].append(part[1].split()[::2])
-            if len(part[0]) > MAX_LEN:
-                MAX_LEN = len(part[0])
-                # LONGEST_STR = part[0]
-            line = dict_file.readline()
-    dict_file.close()
+    global DICT, MAX_LEN
+    with open(dict_path, 'r') as dict_file:
+        line = dict_file.readline()
+        last_len = 0
+        while line != '':
+            try:
+                length = int(line)
+                while last_len != length:
+                    DICT.append([])
+                    last_len += 1
+                line = dict_file.readline()
+            except ValueError:
+                part = line.split(":")
+                DICT[length - 1].append(part[0])
+                if len(part[0]) > MAX_LEN:
+                    MAX_LEN = len(part[0])
+                line = dict_file.readline()
 
 
 def FMM(line):
@@ -68,16 +62,12 @@ def BMM(line):
 
 if __name__ == "__main__":
     load_dict(DICT_PATH)
-    Data_file = open(DATA_PATH, 'r')
-    Out_FMM_file = open(SEG_FMM_PATH, 'w')
-    Out_BMM_file = open(SEG_BMM_PATH, 'w')
-    Line = Data_file.readline()
-    while Line != '':
-        Rst_FMM = FMM(Line.strip('\n'))
-        Rst_BMM = BMM(Line.strip('\n'))
-        Out_FMM_file.write(Rst_FMM + '\n')
-        Out_BMM_file.write(Rst_BMM + '\n')
+    with open(DATA_PATH, 'r') as Data_file, \
+            open(SEG_FMM_PATH, 'w') as Out_FMM_file, open(SEG_BMM_PATH, 'w') as Out_BMM_file:
         Line = Data_file.readline()
-    Out_FMM_file.close()
-    Out_BMM_file.close()
-    Data_file.close()
+        while Line != '':
+            Rst_FMM = FMM(Line.strip('\n'))
+            Rst_BMM = BMM(Line.strip('\n'))
+            Out_FMM_file.write(Rst_FMM + '\n')
+            Out_BMM_file.write(Rst_BMM + '\n')
+            Line = Data_file.readline()
