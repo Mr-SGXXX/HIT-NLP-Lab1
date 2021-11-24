@@ -23,77 +23,40 @@ def compare_by_line(line_STD, line_FMM, line_BMM):
     start_pos_BMM = 0
     cur_pos_BMM = 0
     len_BMM = len(line_BMM)
-    long_word = ""
-    long_word_flag = False
     if len_STD == 1:
         return
     while cur_pos_STD != len_STD or cur_pos_FMM != len_FMM or cur_pos_BMM != len_BMM:
-        if not long_word_flag:
-            if line_STD[cur_pos_STD] != line_FMM[cur_pos_FMM] or line_STD[cur_pos_STD] != line_BMM[cur_pos_BMM]:
-                print("AAA")
-                raise ValueError
-            if line_STD[start_pos_STD: cur_pos_STD] == line_FMM[start_pos_FMM: cur_pos_FMM] and \
-                    line_FMM[cur_pos_FMM + 1] == line_STD[cur_pos_STD + 1] and \
-                    line_STD[cur_pos_STD + 1] == '/':
-                Correct_num_FMM += 1
-            if line_STD[start_pos_STD: cur_pos_STD] == line_BMM[start_pos_BMM: cur_pos_BMM] and \
-                    line_BMM[cur_pos_BMM + 1] == line_STD[cur_pos_STD + 1] and \
-                    line_STD[cur_pos_STD + 1] == '/':
-                Correct_num_BMM += 1
-            cur_pos_STD += 1
-            cur_pos_FMM += 1
-            cur_pos_BMM += 1
-            if line_STD[cur_pos_STD] == '/':
-                while line_STD[cur_pos_STD] != ' ' and cur_pos_STD < len_STD:
-                    cur_pos_STD += 1
-                Total_num_STD += 1
+        if line_STD[cur_pos_STD] != line_FMM[cur_pos_FMM] or line_STD[cur_pos_STD] != line_BMM[cur_pos_BMM]:
+            print("代码有问题：字符没对齐")
+            raise ValueError
+        if line_STD[start_pos_STD: cur_pos_STD] == line_FMM[start_pos_FMM: cur_pos_FMM] and \
+                line_FMM[cur_pos_FMM + 1] == line_STD[cur_pos_STD + 1] and \
+                line_STD[cur_pos_STD + 1] == '/':
+            Correct_num_FMM += 1
+        if line_STD[start_pos_STD: cur_pos_STD] == line_BMM[start_pos_BMM: cur_pos_BMM] and \
+                line_BMM[cur_pos_BMM + 1] == line_STD[cur_pos_STD + 1] and \
+                line_STD[cur_pos_STD + 1] == '/':
+            Correct_num_BMM += 1
+        cur_pos_STD += 1
+        cur_pos_FMM += 1
+        cur_pos_BMM += 1
+        if line_STD[cur_pos_STD] == '/':
+            while line_STD[cur_pos_STD] != ' ' and cur_pos_STD < len_STD:
                 cur_pos_STD += 1
-                if cur_pos_STD < len_STD and line_STD[cur_pos_STD] == '[':
-                    long_word_flag = True
-                    cur_pos_STD += 1
-                start_pos_STD = cur_pos_STD
-            if line_FMM[cur_pos_FMM] == '/':
-                Total_num_FMM += 1
-                cur_pos_FMM += 2
-                start_pos_FMM = cur_pos_FMM
-            if line_BMM[cur_pos_BMM] == '/':
-                Total_num_BMM += 1
-                cur_pos_BMM += 2
-                start_pos_BMM = cur_pos_BMM
-        else:
-            if line_STD[cur_pos_STD] != line_FMM[cur_pos_FMM] or line_STD[cur_pos_STD] != line_BMM[cur_pos_BMM]:
-                print("AAA")
-                raise ValueError
-            long_word += line_STD[cur_pos_STD]
+            Total_num_STD += 1
             cur_pos_STD += 1
-            cur_pos_FMM += 1
-            cur_pos_BMM += 1
-            if line_STD[cur_pos_STD] == '/':
-                while line_STD[cur_pos_STD] != ' ' and line_STD[cur_pos_STD] != ']' and cur_pos_STD < len_STD:
-                    cur_pos_STD += 1
-                if line_STD[cur_pos_STD] == ']':
-                    if long_word == line_FMM[start_pos_FMM: cur_pos_FMM - 1] and line_FMM[cur_pos_FMM] == '/':
-                        Correct_num_FMM += 1
-                    if long_word == line_BMM[start_pos_BMM: cur_pos_BMM - 1] and line_BMM[cur_pos_BMM] == '/':
-                        Correct_num_BMM += 1
-                    Total_num_STD += 1
-                    long_word = ""
-                    long_word_flag = False
-                    while line_STD[cur_pos_STD] != ' ' and cur_pos_STD < len_STD:
-                        cur_pos_STD += 1
+            if cur_pos_STD < len_STD and line_STD[cur_pos_STD] == '[':
                 cur_pos_STD += 1
-                if cur_pos_STD < len_STD and line_STD[cur_pos_STD] == '[':
-                    long_word_flag = True
-                    cur_pos_STD += 1
-                start_pos_STD = cur_pos_STD
-            if line_FMM[cur_pos_FMM] == '/':
-                Total_num_FMM += 1
-                cur_pos_FMM += 2
-                start_pos_FMM = cur_pos_FMM
-            if line_BMM[cur_pos_BMM] == '/':
-                Total_num_BMM += 1
-                cur_pos_BMM += 2
-                start_pos_BMM = cur_pos_BMM
+            start_pos_STD = cur_pos_STD
+        if line_FMM[cur_pos_FMM] == '/':
+            Total_num_FMM += 1
+            cur_pos_FMM += 2
+            start_pos_FMM = cur_pos_FMM
+        if line_BMM[cur_pos_BMM] == '/':
+            Total_num_BMM += 1
+            cur_pos_BMM += 2
+            start_pos_BMM = cur_pos_BMM
+
 
 
 def save_rst():
