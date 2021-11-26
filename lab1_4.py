@@ -4,54 +4,97 @@ import time
 
 class TrieTree:
     def __init__(self):
-        self.root = []
+        self.root = [None] * HASH_ARRAY_SIZE
 
     def add_word(self, word):
-        try:
-            index = self.root.index(word[0])
-            self.root[index + 1].add_child(word)
-        except ValueError:
-            self.root.append(word[0])
-            self.root.append(TrieNode(word))
+        child, node_list = self.get_child_with(word[0])
+        if child is None:
+            if node_list is None:
+                self.root[hash_letter(word[0], HASH_ARRAY_SIZE)] = [TrieNode(word)]
+            else:
+                node_list.append(TrieNode(word))
+        else:
+            child.add_child(word)
+        # try:
+        #     index = self.root.index(word[0])
+        #     self.root[index + 1].add_child(word)
+        # except ValueError:
+        #     self.root.append(word[0])
+        #     self.root.append(TrieNode(word))
+
+    def get_child_with(self, character):
+        node_list = self.root[hash_word(character, HASH_ARRAY_SIZE)]
+        if node_list is None:
+            return None, None
+        for node in node_list:
+            if node.character == character:
+                return node, node_list
+        return None, node_list
+
+    def get_child(self, word):
+        i = 0
+        child, node_list = self.get_child_with(word[0])
+        if child is None:
+            return None
+        while i != len(word) - 1:
+            i += 1
+            child, node_list = child.get_child_with(word[i])
+            if child is None:
+                return None
+        return child
 
     def have_word(self, word):
         i = 0
-        try:
-            index = self.root.index(word[i])
-            cur_node = self.root[index + 1]
-        except ValueError:
+        child, node_list = self.get_child_with(word[0])
+        if child is None:
             return False
+        # cur_node = self.root[hash_word(word[i], HASH_ARRAY_SIZE)]
+        # try:
+        #     index = self.root.index(word[i])
+        #     cur_node = self.root[index + 1]
+        # except ValueError:
+        #     return False
         while i != len(word) - 1:
             i += 1
-            cur_node = cur_node.get_child_with(word[i])
-            if cur_node is None:
+            child, node_list = child.get_child_with(word[i])
+            if child is None:
                 return False
-        return cur_node.is_terminal()
+        return child.is_terminal()
 
 
 class TrieNode:
     def __init__(self, left_letters):
         self.character = left_letters[0]
-        self.children = []
+        # self.children = []
+        self.children = [None] * HASH_ARRAY_SIZE
         if len(left_letters) != 1:
             self.terminal_flag = False
-            try:
-                index = self.children.index(left_letters[1])
-                self.children[index + 1].add_child(left_letters[1:])
-            except ValueError:
-                self.children.append(left_letters[1])
-                self.children.append(TrieNode(left_letters[1:]))
+            self.children[hash_letter(left_letters[1], HASH_ARRAY_SIZE)] = [TrieNode(left_letters[1:])]
+            # try:
+            #     index = self.children.index(left_letters[1])
+            #     self.children[index + 1].add_child(left_letters[1:])
+            # except ValueError:
+            #     self.children.append(left_letters[1])
+            #     self.children.append(TrieNode(left_letters[1:]))
         else:
             self.terminal_flag = True
 
     def add_child(self, left_letters):
         if len(left_letters) != 1:
-            try:
-                index = self.children.index(left_letters[1])
-                self.children[index + 1].add_child(left_letters[1:])
-            except ValueError:
-                self.children.append(left_letters[1])
-                self.children.append(TrieNode(left_letters[1:]))
+            child, node_list = self.get_child_with(left_letters[1])
+            if child is None:
+                if node_list is None:
+                    self.children[hash_letter(left_letters[1], HASH_ARRAY_SIZE)] = [TrieNode(left_letters[1:])]
+                else:
+                    node_list.append(TrieNode(left_letters[1:]))
+            else:
+                child.add_child(left_letters[1:])
+            # try:
+            #     index = self.children.index(left_letters[1])
+            #     self.children[index + 1].add_child(left_letters[1:])
+            # except ValueError:
+            #     self.children.append(left_letters[1])
+            #     self.children.append(TrieNode(left_letters[1:]))
         else:
             self.terminal_flag = True
 
@@ -59,22 +102,44 @@ class TrieNode:
         return self.terminal_flag
 
     def get_child_with(self, character):
-        try:
-            index = self.children.index(character)
-            return self.children[index + 1]
-        except ValueError:
-            return None
+        node_list = self.children[hash_letter(character, HASH_ARRAY_SIZE)]
+        if node_list is None:
+            return None, None
+        for node in node_list:
+            if node.character == character:
+                return node, node_list
+        return None, node_list
+        # try:
+        #     index = self.children.index(character)
+        #     return self.children[index + 1]
+        # except ValueError:
+        #     return None
+
+    def __str__(self):
+        return '字符：' + str(self.character)
 
 
 DATA_PATH = "./res/199801_sent.txt"
 DICT_PATH = "./res/dic.txt"
 TIME_COST_PATH = "./res/TimeCost.txt"
+HASH_ARRAY_SIZE = 10000
 
 Max_len = 0
 Dict = []
 Dict_accelerate = None
 Accelerate_flag = False
 Trie_tree = TrieTree()
+
+
+def hash_letter(letter, array_size):
+    return (ord(letter) + 5) % array_size
+
+
+def hash_word(word, array_size):
+    hash_code = 1
+    for i in word:
+        hash_code = (hash_code * ord(i) + 5) % array_size
+    return hash_code
 
 
 def load_dict(dict_path):
@@ -144,15 +209,15 @@ if __name__ == "__main__":
     # Origin_file = open("./res/origin_MM.txt", 'w')
     # New_file = open("./res/new_MM.txt", 'w')
     Time_cost_file = open(TIME_COST_PATH, 'w')
-    Time_start = time.time()
-    with open(DATA_PATH, 'r') as Data_file:
-        Line = Data_file.readline()
-        while Line != '':
-            Rst_FMM = FMM(Line.strip('\n'))
-            # Origin_file.write(Rst_FMM + '\n')
-            Line = Data_file.readline()
-    Time_end = time.time()
-    Time_cost_file.write("未加速FMM用时： " + str(Time_end - Time_start) + "s\n")
+    # Time_start = time.time()
+    # with open(DATA_PATH, 'r') as Data_file:
+    #     Line = Data_file.readline()
+    #     while Line != '':
+    #         Rst_FMM = FMM(Line.strip('\n'))
+    #         # Origin_file.write(Rst_FMM + '\n')
+    #         Line = Data_file.readline()
+    # Time_end = time.time()
+    # Time_cost_file.write("未加速FMM用时： " + str(Time_end - Time_start) + "s\n")
     load_dict_accelerate(DICT_PATH)
     Time_start = time.time()
     with open(DATA_PATH, 'r') as Data_file:
@@ -166,4 +231,3 @@ if __name__ == "__main__":
     Time_cost_file.close()
     # Origin_file.close()
     # New_file
-
