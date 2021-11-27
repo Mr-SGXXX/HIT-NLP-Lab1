@@ -43,15 +43,15 @@ def output_dict():
     dict_file = open(DICT_PATH, "w")
     i = 0
     for word in DICT:
-        line = word + ":"
-        for value in DICT[word]:
-            if i % 2 == 0:
-                line += value + " "
-                num = PROPERTY_MAP[value]
-                i = 1
-            else:
-                line += str(value / num) + " "
-                i = 0
+        line = word # + ":"
+        # for value in DICT[word]:
+        #     if i % 2 == 0:
+        #         line += value + " "
+        #         num = PROPERTY_MAP[value]
+        #         i = 1
+        #     else:
+        #         line += str(value / num) + " "
+        #         i = 0
         dict_file.write(line + '\n')
     dict_file.close()
 

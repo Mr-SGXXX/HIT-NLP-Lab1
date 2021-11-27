@@ -13,9 +13,8 @@ def load_dict(dict_path):
     with open(dict_path, 'r') as dict_file:
         lines = dict_file.readlines()
         for line in lines:
-            part = line.split(":")
-            DICT.append(part[0])
-            MAX_LEN = max(len(part[0]), MAX_LEN)
+            DICT.append(line.strip('\n'))
+            MAX_LEN = max(len(line), MAX_LEN)
 
 
 def FMM(line):

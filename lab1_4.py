@@ -105,22 +105,14 @@ def hash_letter(letter, array_size):
     return (ord(letter) + 5) % array_size
 
 
-def hash_word(word, array_size):
-    hash_code = 1
-    for i in word:
-        hash_code = (hash_code * ord(i) + 5) % array_size
-    return hash_code
-
-
 def load_dict(dict_path):
     global Dict, Max_len
     with open(dict_path, 'r') as dict_file:
         line = dict_file.readline()
         while line != '':
-            part = line.split(":")
-            Dict.append(part[0])
-            if len(part[0]) > Max_len:
-                Max_len = len(part[0])
+            Dict.append(line)
+            if len(line) > Max_len:
+                Max_len = len(line)
             line = dict_file.readline()
 
 
@@ -128,18 +120,13 @@ def load_dict_accelerate(dict_path):
     global Accelerate_flag, Dict_accelerate, Trie_tree, Max_len
     Accelerate_flag = True
     dict_file = open(dict_path, 'r')
-    line = dict_file.readline()
+    line = dict_file.readline().strip('\n')
     while line != '':
-        try:
-            int(line)
-            line = dict_file.readline()
-        except ValueError:
-            part = line.split(":")
-            if len(part[0]) != 1:
-                Trie_tree.add_word(part[0])
-            if len(part[0]) > Max_len:
-                Max_len = len(part[0])
-            line = dict_file.readline()
+        if len(line) != 1:
+            Trie_tree.add_word(line)
+        if len(line) > Max_len:
+            Max_len = len(line)
+        line = dict_file.readline().strip('\n')
     dict_file.close()
 
 
