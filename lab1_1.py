@@ -52,7 +52,8 @@ def output_dict():
         #     else:
         #         line += str(value / num) + " "
         #         i = 0
-        dict_file.write(line + '\n')
+        if len(word) > 1:
+            dict_file.write(line + '\n')
     dict_file.close()
 
 
