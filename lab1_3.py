@@ -58,7 +58,6 @@ def compare_by_line(line_STD, line_FMM, line_BMM):
             start_pos_BMM = cur_pos_BMM
 
 
-
 def save_rst():
     global Correct_num_FMM, Total_num_FMM, Correct_num_BMM, Total_num_BMM, Total_num_STD
     score_file = open(SCORE_PATH, 'w')
