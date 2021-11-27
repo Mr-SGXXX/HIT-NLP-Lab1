@@ -1,5 +1,6 @@
 # 实验一第四部分 - 基于机械匹配的分词系统的速度优化
 import time
+from utils import pre_process
 
 
 class TrieTree:
@@ -130,16 +131,12 @@ def load_dict_accelerate(dict_path):
     dict_file = open(dict_path, 'r')
     line = dict_file.readline()
     while line != '':
-        try:
-            int(line)
-            line = dict_file.readline()
-        except ValueError:
-            part = line.split(":")
-            if len(part[0]) != 1:
-                Trie_tree.add_word(part[0])
-            if len(part[0]) > Max_len:
-                Max_len = len(part[0])
-            line = dict_file.readline()
+        part = line.split(":")
+        if len(part[0]) != 1:
+            Trie_tree.add_word(part[0])
+        if len(part[0]) > Max_len:
+            Max_len = len(part[0])
+        line = dict_file.readline()
     dict_file.close()
 
 
@@ -147,38 +144,44 @@ def FMM(line):
     rst = ""
     while len(line) > 0:
         cur_len = Max_len if Max_len < len(line) else len(line)
-        try_word = line[:cur_len]
+        # try_word = line[:cur_len]
+        try_word = line[len(line) - cur_len:]
         while cur_len > 1:
-            if not Accelerate_flag and try_word not in Dict:
+            processed_word = pre_process(try_word)
+            if not Accelerate_flag and processed_word not in Dict:
                 try_word = try_word[:len(try_word) - 1]
-            elif Accelerate_flag and not Trie_tree.have_word(try_word):
-                try_word = try_word[:len(try_word) - 1]
+            elif Accelerate_flag and not Trie_tree.have_word(processed_word):
+                # try_word = try_word[:len(try_word) - 1]
+                try_word = try_word[1:]
             else:
                 break
             cur_len -= 1
         rst = rst + try_word + '/ '
-        line = line[len(try_word):]
+        # line = line[len(try_word):]
+        line = line[:len(line) - len(try_word)]
     return rst
 
 
 if __name__ == "__main__":
     load_dict(DICT_PATH)
     Time_cost_file = open(TIME_COST_PATH, 'w')
-    Time_start = time.time()
-    with open(DATA_PATH, 'r') as Data_file:
-        Line = Data_file.readline()
-        while Line != '':
-            FMM(Line.strip('\n'))
-            Line = Data_file.readline()
-    Time_end = time.time()
-    Time_cost_file.write("未加速FMM用时： " + str(Time_end - Time_start) + "s\n")
+    # Time_start = time.time()
+    # with open(DATA_PATH, 'r') as Data_file:
+    #     Line = Data_file.readline()
+    #     while Line != '':
+    #         FMM(Line.strip('\n'))
+    #         Line = Data_file.readline()
+    # Time_end = time.time()
+    # Time_cost_file.write("未加速FMM用时： " + str(Time_end - Time_start) + "s\n")
     load_dict_accelerate(DICT_PATH)
+    a = open("./res/seg_BMM1.txt", "w")
     Time_start = time.time()
     with open(DATA_PATH, 'r') as Data_file:
         Line = Data_file.readline()
         while Line != '':
-            FMM(Line.strip('\n'))
+            a.write(FMM(Line.strip('\n')) + "\n")
             Line = Data_file.readline()
     Time_end = time.time()
     Time_cost_file.write("加速后FMM用时： " + str(Time_end - Time_start) + "s\n")
     Time_cost_file.close()
+    a.close()
