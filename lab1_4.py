@@ -1,6 +1,6 @@
 # 实验一第四部分 - 基于机械匹配的分词系统的速度优化
 import time
-from utils import pre_process
+from lab1_5.utils import pre_process
 
 
 class TrieTree:

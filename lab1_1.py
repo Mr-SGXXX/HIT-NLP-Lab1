@@ -1,9 +1,9 @@
 # 实验一第一部分 - 词典的构建
-from utils import pre_process
+from lab1_5.utils import pre_process
 
 DICT = {}
 PROPERTY_MAP = {}
-DATA_PATH_LIST = ["./res/199801_seg&pos.txt"]
+DATA_PATH_LIST = ["./res/199801_seg&pos.txt", "./res/199802.txt"]
 DICT_PATH = "./res/dic.txt"
 MAX_WORD_LEN = 0
 
