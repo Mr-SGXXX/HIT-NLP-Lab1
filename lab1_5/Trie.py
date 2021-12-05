@@ -52,14 +52,15 @@ class TrieNode:
 
 
 class TrieTree:
-    def __init__(self):
+    def __init__(self, pre_process_flag=True):
         self.root = {}
         self.max_len = 0
+        self.pre_process_flag = pre_process_flag
 
     def add_word(self, word, part_of_speech):
         if len(word) > self.max_len:
             self.max_len = len(word)
-        word = pre_process(word)
+        word = pre_process(word) if self.pre_process_flag else word
         child = self.get_child_with(word[0])
         if child is None:
             child = TrieNode(word, part_of_speech)
@@ -73,7 +74,7 @@ class TrieTree:
         return self.root[character]
 
     def get_child(self, word):
-        word = pre_process(word)
+        word = pre_process(word) if self.pre_process_flag else word
         i = 0
         child = self.get_child_with(word[0])
         if child is None:
@@ -86,12 +87,12 @@ class TrieTree:
         return child
 
     def get_word_info(self, word):
-        word = pre_process(word)
+        word = pre_process(word) if self.pre_process_flag else word
         child = self.get_child(word)
         if child is not None and child.is_terminal():
             return child.occur_time, child.pos_map
         else:
-            return None, None
+            return 1, None
 
     def with_prefix(self, prefix) -> Tuple[bool, TrieNode]:
         i = 0
@@ -106,7 +107,7 @@ class TrieTree:
         return True, child
 
     def have_word(self, word):
-        word = pre_process(word)
+        word = pre_process(word) if self.pre_process_flag else word
         i = 0
         child = self.get_child_with(word[0])
         if child is None:

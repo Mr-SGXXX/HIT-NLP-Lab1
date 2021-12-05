@@ -4,22 +4,51 @@ from Trie import TrieTree
 import numpy as np
 
 Dict_Trie = TrieTree()
+Prefix_Trie = TrieTree(False)
 Pos_Label_Map = ['st', 'ed']
 Pos_Num_Map = {}
 Total_Word_Num = 0
 State_Trans_Mat = np.zeros((50, 50))
 
+
 def smooth_plus1():
     global State_Trans_Mat
     pass
+
 
 def smooth_good_turing():
     global State_Trans_Mat
     pass
 
+
 def smooth_katz():
     global State_Trans_Mat
     pass
+
+
+def load_test(part, part_num, raw_data_path, true_data_path):
+    line_num = -1
+    raw_lines = []
+    with open(raw_data_path, 'r') as data_file:
+        line = data_file.readline()
+        line_num += 1
+        while line != '':
+            if line_num % part_num == part or part == -1:
+                raw_lines.append(line.strip('\n'))
+            line = data_file.readline()
+            line_num += 1
+    line_num = -1
+    true_lines = []
+    with open(true_data_path, 'r') as data_file:
+        line = data_file.readline()
+        line_num += 1
+        while line != '':
+            if line_num % part_num == part or part == -1:
+                true_lines.append(line.strip('\n'))
+            line = data_file.readline()
+            line_num += 1
+    return raw_lines, true_lines
+
 
 def load_dict(part, part_num, data_path_list, smooth_func=None):
     """
@@ -30,30 +59,28 @@ def load_dict(part, part_num, data_path_list, smooth_func=None):
     :param smooth_func: 参数平滑函数
     :return: 前缀树、词性顺序、词性出现数目、总词数、状态转移矩阵
     """
-    global Dict_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
-    line_num = 0
+    global Dict_Trie, Prefix_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
+    line_num = -1
     Pos_Num_Map['st'] = 0
     Pos_Num_Map['ed'] = 0
     for data_path in data_path_list:
-        with open(data_path) as data_file:
+        with open(data_path, 'r') as data_file:
             line = data_file.readline()
             line_num += 1
-            if line_num % part_num != part or part == -1:
-                load_by_line(line.strip('\n'))
             while line != '':
-                line = data_file.readline()
-                line_num += 1
                 if line_num % part_num != part or part == -1:
                     load_by_line(line.strip('\n'))
+                line = data_file.readline()
+                line_num += 1
     for i in range(len(Pos_Label_Map)):
         State_Trans_Mat[i] /= Pos_Num_Map[Pos_Label_Map[i]]
     if smooth_func is not None:
         smooth_func()
-    return Dict_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
+    return Dict_Trie, Prefix_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
 
 
 def load_by_line(line):
-    global Dict_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
+    global Dict_Trie, Prefix_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
     word_list = line.split()
     long_word_flag = False
     parts = None
@@ -75,6 +102,7 @@ def load_by_line(line):
             parts[1] = word_c[0]
             long_word_flag = False
         Dict_Trie.add_word(parts[0], parts[1])
+        Prefix_Trie.add_word(parts[0], parts[1])
         Total_Word_Num += 1
         if i == 0 and pre_process(parts[0]) == "\\linePosition":
             continue
@@ -92,5 +120,3 @@ def load_by_line(line):
         j = 1
         State_Trans_Mat[i, j] += 1
         Pos_Num_Map['ed'] += 1
-
-
