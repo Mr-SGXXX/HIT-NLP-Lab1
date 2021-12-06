@@ -20,14 +20,26 @@ class DAG:
                     tmp_list.append(i)
                 i += 1
                 tmp = sentence[k:i + 1]
-                prefix_flag, prefix_node = prefix_trie.with_prefix(tmp) # 前缀树里没有不存在的段落号单词，导致图里没有这个单词
+                prefix_flag, prefix_node = prefix_trie.with_prefix(tmp)  # 前缀树里没有不存在的段落号单词，导致图里没有这个单词
             if not tmp_list:
                 tmp_list.append(k)
             self.dag[k] = tmp_list
 
     def HMM(self, pos_label_map, pos_num_map, state_trans_mat):
-        pre_pos = 'st'
-        pass
+        s_len = len(self.sentence)
+        route = {s_len: (0, 0)}
+        next_pos = 'ed'
+        for start in range(s_len - 1, -1, -1):
+            max_end = 0
+            max_log = -float('inf')
+            for end in self.dag[0]:
+                log = 1
+                if log > max_log:
+                    max_log = log
+                    max_end = end
+
+            if pre_process(self.sentence[0:max_end]) == "\\linePosition":
+                pass
 
     def max_frequency(self, total_word_num):
         s_len = len(self.sentence)

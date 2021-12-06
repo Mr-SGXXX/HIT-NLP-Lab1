@@ -12,17 +12,17 @@ State_Trans_Mat = np.zeros((50, 50))
 
 
 def smooth_plus1():
-    global State_Trans_Mat
+    global State_Trans_Mat, Pos_Label_Map
     pass
 
 
 def smooth_good_turing():
-    global State_Trans_Mat
+    global State_Trans_Mat, Pos_Label_Map
     pass
 
 
 def smooth_katz():
-    global State_Trans_Mat
+    global State_Trans_Mat, Pos_Label_Map
     pass
 
 
