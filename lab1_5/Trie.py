@@ -1,5 +1,6 @@
 from typing import Tuple
-from utils import pre_process
+from utils import pre_process, turn_zero
+
 
 class TrieNode:
     def __init__(self, left_letters, part_of_speech):
@@ -60,7 +61,10 @@ class TrieTree:
     def add_word(self, word, part_of_speech):
         if len(word) > self.max_len:
             self.max_len = len(word)
-        word = pre_process(word) if self.pre_process_flag else word
+        if self.pre_process_flag:
+            word = pre_process(word)
+        else:
+            word = turn_zero(word)
         child = self.get_child_with(word[0])
         if child is None:
             child = TrieNode(word, part_of_speech)
@@ -74,7 +78,10 @@ class TrieTree:
         return self.root[character]
 
     def get_child(self, word):
-        word = pre_process(word) if self.pre_process_flag else word
+        if self.pre_process_flag:
+            word = pre_process(word)
+        else:
+            word = turn_zero(word)
         i = 0
         child = self.get_child_with(word[0])
         if child is None:
@@ -87,7 +94,10 @@ class TrieTree:
         return child
 
     def get_word_info(self, word):
-        word = pre_process(word) if self.pre_process_flag else word
+        if self.pre_process_flag:
+            word = pre_process(word)
+        else:
+            word = turn_zero(word)
         child = self.get_child(word)
         if child is not None and child.is_terminal():
             return child.occur_time, child.pos_map
@@ -95,6 +105,7 @@ class TrieTree:
             return 1, None
 
     def with_prefix(self, prefix) -> Tuple[bool, TrieNode]:
+        prefix = turn_zero(prefix)
         i = 0
         child = self.get_child_with(prefix[0])
         if child is None:
@@ -107,7 +118,10 @@ class TrieTree:
         return True, child
 
     def have_word(self, word):
-        word = pre_process(word) if self.pre_process_flag else word
+        if self.pre_process_flag:
+            word = pre_process(word)
+        else:
+            word = turn_zero(word)
         i = 0
         child = self.get_child_with(word[0])
         if child is None:

@@ -32,6 +32,16 @@ def pre_process(word):
     return word
 
 
+def turn_zero(word):
+    new_word = ""
+    for i in range(len(word)):
+        if is_num(word[i]) and word[i] != '0':
+            new_word += '0'
+        else:
+            new_word += word[i]
+    return new_word
+
+
 def is_num(word):
     word = word.replace("○", "零")
     word = word.replace("点", "．")
