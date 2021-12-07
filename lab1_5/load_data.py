@@ -13,7 +13,9 @@ State_Trans_Mat = np.zeros((50, 50))
 
 def smooth_plus1():
     global State_Trans_Mat, Pos_Label_Map
-    pass
+    pos_num = len(Pos_Label_Map)
+    mat = State_Trans_Mat[:pos_num, :pos_num]
+    mat[mat == 0] = 1
 
 
 def smooth_good_turing():
@@ -50,12 +52,13 @@ def load_test(part, part_num, raw_data_path, true_data_path):
     return raw_lines, true_lines
 
 
-def load_dict(part, part_num, data_path_list, smooth_func=None):
+def load_dict(part, part_num, data_path_list, folded_data_list, smooth_func=smooth_plus1):
     """
     载入数据
     :param part: k折时不取的第k折
     :param part_num: 折数
     :param data_path_list: 数据路径
+    :param folded_data_list: 需要K折的文件序号
     :param smooth_func: 参数平滑函数
     :return: 前缀树、词性顺序、词性出现数目、总词数、状态转移矩阵
     """
@@ -63,19 +66,20 @@ def load_dict(part, part_num, data_path_list, smooth_func=None):
     line_num = -1
     Pos_Num_Map['st'] = 0
     Pos_Num_Map['ed'] = 0
+    seq = 0
     for data_path in data_path_list:
+        seq += 1
         with open(data_path, 'r') as data_file:
             line = data_file.readline()
             line_num += 1
             while line != '':
-                if line_num % part_num != part or part == -1:
+                if (line_num % part_num != part or part == -1) and seq in folded_data_list:
+                    load_by_line(line.strip('\n'))
+                if seq not in folded_data_list:
                     load_by_line(line.strip('\n'))
                 line = data_file.readline()
                 line_num += 1
-    for i in range(len(Pos_Label_Map)):
-        State_Trans_Mat[i] /= Pos_Num_Map[Pos_Label_Map[i]]
-    if smooth_func is not None:
-        smooth_func()
+    smooth_func()
     return Dict_Trie, Prefix_Trie, Pos_Label_Map, Pos_Num_Map, Total_Word_Num, State_Trans_Mat
 
 

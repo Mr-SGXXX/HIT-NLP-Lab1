@@ -1,4 +1,5 @@
-import math
+from math import log
+import numpy as np
 
 from Trie import TrieTree
 from utils import pre_process
@@ -26,33 +27,55 @@ class DAG:
             self.dag[k] = tmp_list
 
     def HMM(self, pos_label_map, pos_num_map, state_trans_mat):
-        s_len = len(self.sentence)
-        route = {s_len: (0, 0)}
-        next_pos = 'ed'
-        for start in range(s_len - 1, -1, -1):
-            max_end = 0
-            max_log = -float('inf')
-            for end in self.dag[0]:
-                log = 1
-                if log > max_log:
-                    max_log = log
-                    max_end = end
-
-            if pre_process(self.sentence[0:max_end]) == "\\linePosition":
-                pass
+        # 后向算法
+        sp = 0
+        if pre_process(self.sentence[0:19]) == "\\linePosition":
+            sp = 19
+        s_len = len(self.sentence) - sp
+        route = {s_len + sp: (0.0, 0, 1)}
+        for start in range(s_len + sp - 1, sp - 1, -1):
+            max_end = start
+            max_state = 1
+            max_log_beta = -float('inf')
+            for end in self.dag[start]:
+                for i in range(len(pos_label_map) - 2):
+                    pos_times = pos_num_map[pos_label_map[i + 2]]
+                    word_pos_map = self.dict_trie.get_word_info(self.sentence[start:end + 1])[1]
+                    if word_pos_map is None or pos_label_map[i + 2] not in word_pos_map:
+                        word_pos_times = 0
+                    else:
+                        word_pos_times = word_pos_map[pos_label_map[i + 2]]
+                    if end == s_len + sp - 1:
+                        temp_log = log(state_trans_mat[i + 2, 1]) - 2 * log(pos_times) \
+                                    + (log(word_pos_times) if word_pos_times != 0 else -10.00)
+                    else:
+                        next_log, next_end, next_state = route[end + 1]
+                        temp_log = next_log + log(state_trans_mat[i + 2, next_state]) \
+                                    - 2 * log(pos_times) + (log(word_pos_times) if word_pos_times != 0 else -10.00)
+                    if max_log_beta < temp_log:
+                        max_log_beta = temp_log
+                        max_state = i + 2
+                        max_end = end
+            route[start] = (max_log_beta, max_end, max_state)
+        line = '' if sp == 0 else self.sentence[0:19] + '/ '
+        i = sp
+        while route[i][2] != 1:
+            line += self.sentence[i:route[i][1] + 1] + '/ '
+            i = route[i][1] + 1
+        return line
 
     def max_frequency(self, total_word_num):
         s_len = len(self.sentence)
         route = {s_len: (0, 0)}
-        log_total = math.log(total_word_num)
+        log_total = log(total_word_num)
         for start in range(s_len - 1, -1, -1):
             max_end = start
             max_log = -float('inf')
             for end in self.dag[start]:
-                log = math.log(self.dict_trie.get_word_info(self.sentence[start:end + 1])[0]) \
-                      - log_total + route[end + 1][0]
-                if log > max_log:
-                    max_log = log
+                log_v = log(self.dict_trie.get_word_info(self.sentence[start:end + 1])[0]) \
+                        - log_total + route[end + 1][0]
+                if log_v > max_log:
+                    max_log = log_v
                     max_end = end
             route[start] = (max_log, max_end)
         line = ''
