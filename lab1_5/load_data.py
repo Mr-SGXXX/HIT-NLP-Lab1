@@ -73,6 +73,8 @@ def load_dict(part, part_num, data_path_list, folded_data_list, smooth_func=smoo
             line = data_file.readline()
             line_num += 1
             while line != '':
+                if line_num % 2500 == 0:
+                    print("已读取行数：" + str(line_num))
                 if (line_num % part_num != part or part == -1) and seq in folded_data_list:
                     load_by_line(line.strip('\n'))
                 if seq not in folded_data_list:

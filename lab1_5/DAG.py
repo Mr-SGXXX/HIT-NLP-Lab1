@@ -26,7 +26,7 @@ class DAG:
                 tmp_list.append(k)
             self.dag[k] = tmp_list
 
-    def HMM(self, pos_label_map, pos_num_map, state_trans_mat):
+    def HMM(self, pos_label_map, pos_num_map, state_trans_mat, total_word_num):
         # 后向算法
         sp = 0
         if pre_process(self.sentence[0:19]) == "\\linePosition":
@@ -42,16 +42,16 @@ class DAG:
                     pos_times = pos_num_map[pos_label_map[i + 2]]
                     word_pos_map = self.dict_trie.get_word_info(self.sentence[start:end + 1])[1]
                     if word_pos_map is None or pos_label_map[i + 2] not in word_pos_map:
-                        word_pos_times = 0
+                        word_pos_times = pos_times / total_word_num
                     else:
                         word_pos_times = word_pos_map[pos_label_map[i + 2]]
                     if end == s_len + sp - 1:
                         temp_log = log(state_trans_mat[i + 2, 1]) - 2 * log(pos_times) \
-                                    + (log(word_pos_times) if word_pos_times != 0 else -10.00)
+                                   + log(word_pos_times)
                     else:
                         next_log, next_end, next_state = route[end + 1]
                         temp_log = next_log + log(state_trans_mat[i + 2, next_state]) \
-                                    - 2 * log(pos_times) + (log(word_pos_times) if word_pos_times != 0 else -10.00)
+                                   - 2 * log(pos_times) + log(word_pos_times)
                     if max_log_beta < temp_log:
                         max_log_beta = temp_log
                         max_state = i + 2
