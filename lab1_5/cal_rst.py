@@ -30,7 +30,7 @@ def compare_by_line(line_STD, line):
         return
     while cur_pos_STD != len_STD or cur_pos != len_cal:
         if line_STD[cur_pos_STD] != line[cur_pos]:
-            print("代码有问题：字符没对齐")
+            print("代码有问题：字符没对齐\n" + line + '\n' + line_STD)
             raise ValueError
         if line_STD[start_pos_STD: cur_pos_STD] == line[start_pos: cur_pos] and \
                 line[cur_pos + 1] == line_STD[cur_pos_STD + 1] and \

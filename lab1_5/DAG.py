@@ -42,6 +42,8 @@ class DAG:
                     pos_times = pos_num_map[pos_label_map[i + 2]]
                     word_pos_map = self.dict_trie.get_word_info(self.sentence[start:end + 1])[1]
                     if word_pos_map is None or pos_label_map[i + 2] not in word_pos_map:
+                        pos_times += 1
+                        # word_pos_times = 1
                         word_pos_times = pos_times / total_word_num
                     else:
                         word_pos_times = word_pos_map[pos_label_map[i + 2]]

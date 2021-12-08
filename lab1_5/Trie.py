@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, TextIO
 from utils import pre_process, turn_zero
 
 
@@ -39,6 +39,16 @@ class TrieNode:
         if character not in self.children:
             return None
         return self.children[character]
+
+    def save_node(self, former_letters, file: TextIO):
+        if self.terminal_flag:
+            file.write(former_letters + self.character + ' ')
+            file.write(str(self.occur_time) + ' ')
+            for pos in self.pos_map:
+                file.write(pos + ":" + str(self.pos_map[pos]) + ' ')
+            file.write('\n')
+        for child in self.children:
+            self.children[child].save_node(former_letters + self.character, file)
 
     def __str__(self):
         rst_str = '字符：' + str(self.character)
@@ -132,3 +142,82 @@ class TrieTree:
             if child is None:
                 return False
         return child.is_terminal()
+
+    def save_trie(self, file: TextIO):
+        file.write(str(self.max_len) + '\n')
+        file.write(str(self.pre_process_flag) + '\n')
+        for node in self.root:
+            self.root[node].save_node("", file)
+        file.write('END\n')
+
+    def load_word(self, word, occur_time, pos_map):
+        i = 0
+        len_word = len(word)
+        child = self.get_child_with(word[0])
+        if child is None:
+            temp_node = TrieNode('a', 'a')
+            temp_node.occur_time = 0
+            temp_node.pos_map = {}
+            temp_children = self.root
+            if len_word != 1:
+                temp_node.terminal_flag = False
+                temp_node.character = word[0]
+                temp_children[word[0]] = temp_node
+                i += 1
+                while i != len_word:
+                    temp_children = temp_node.children
+                    temp_node = TrieNode('a', 'a')
+                    temp_node.occur_time = 0
+                    temp_node.pos_map = {}
+                    if i == len_word - 1:
+                        temp_node.character = word[0]
+                        temp_node.occur_time = occur_time
+                        temp_node.pos_map = pos_map
+                    else:
+                        temp_node.terminal_flag = False
+                        temp_node.character = word[0]
+                    temp_children[word[i]] = temp_node
+                    i += 1
+            else:
+                temp_node.character = word[0]
+                temp_node.occur_time = occur_time
+                temp_node.pos_map = pos_map
+                temp_children[word[0]] = temp_node
+        else:
+            i += 1
+            while i != len_word:
+                next_child = child.get_child_with(word[i])
+                if next_child is None:
+                    temp_node = child
+                    while i != len_word:
+                        temp_children = temp_node.children
+                        temp_node = TrieNode('a', 'a')
+                        temp_node.occur_time = 0
+                        temp_node.pos_map = {}
+                        if i == len_word - 1:
+                            temp_node.character = word[0]
+                            temp_node.occur_time = occur_time
+                            temp_node.pos_map = pos_map
+                        else:
+                            temp_node.terminal_flag = False
+                            temp_node.character = word[0]
+                        temp_children[word[i]] = temp_node
+                        i += 1
+                else:
+                    child = next_child
+                    i += 1
+
+    def load_trie(self, file: TextIO):
+        line = file.readline().strip('\n')
+        self.max_len = int(line)
+        line = file.readline().strip('\n')
+        self.pre_process_flag = bool(line)
+        line = file.readline().strip('\n')
+        while line != 'END':
+            parts = line.split(' ')
+            pos_map = {}
+            for i in range(len(parts) - 3):
+                pos, time = parts[i + 2].split(':')
+                pos_map[pos] = int(time)
+            self.load_word(parts[0], int(parts[1]), pos_map)
+            line = file.readline().strip('\n')

@@ -90,7 +90,7 @@ class TrieNode:
         return '字符：' + str(self.character)
 
 
-DATA_PATH = "./res/199801_sent.txt"
+DATA_PATH = "./res/199803_sent.txt"
 DICT_PATH = "./res/dic.txt"
 TIME_COST_PATH = "./res/TimeCost.txt"
 HASH_ARRAY_SIZE = 10007
@@ -156,7 +156,8 @@ def FMM(line):
             else:
                 break
             cur_len -= 1
-        rst = rst + try_word + '/ '
+        # rst = rst + try_word + '/ '
+        rst = try_word + '/ ' + rst
         # line = line[len(try_word):]
         line = line[:len(line) - len(try_word)]
     return rst
